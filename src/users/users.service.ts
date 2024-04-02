@@ -18,7 +18,7 @@ export class UsersService {
     }
 
     find(email?: string) {
-        return this.repo.find({ where: { email } });
+        return this.repo.find({ where: { email }, select: ['id', 'email'] });
     }
 
     async findOne(id: number) {
@@ -26,6 +26,7 @@ export class UsersService {
         if (!user) {
             throw new NotFoundException(`User #${id} not found`);
         }
+        // const { password, ...userDto } = user;
         return user;
     }
 

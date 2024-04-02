@@ -12,34 +12,37 @@ import {
 import { createUserDto } from './dto/create-user.dto';
 import { UsersService } from './users.service';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { UserDto } from './dto/user.dto';
+import { Serialize } from 'src/common/serialize.interceptor';
 
 @Controller('auth')
 export class UsersController {
-    constructor(private readonly userService: UsersService) {}
+    constructor(private readonly service: UsersService) {}
 
     @Post('/signup')
     createUser(@Body() userDto: createUserDto) {
-        this.userService.create(userDto);
+        this.service.create(userDto);
     }
 
     @Get('/:id')
+    @Serialize(UserDto)
     findUser(@Param('id') id: string) {
-        return this.userService.findOne(+id);
+        return this.service.findOne(+id);
     }
 
     @Get()
     findAllUsers(@Query('email') email: string) {
-        return this.userService.find(email);
+        return this.service.find(email);
     }
 
     @Delete('/:id')
     @HttpCode(204)
     deleteUser(@Param('id') id: string) {
-        return this.userService.remove(+id);
+        return this.service.remove(+id);
     }
 
     @Patch('/:id')
     updateUser(@Param('id') id: string, @Body() updateDto: UpdateUserDto) {
-        return this.userService.update(+id, updateDto);
+        return this.service.update(+id, updateDto);
     }
 }

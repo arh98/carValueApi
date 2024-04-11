@@ -1,9 +1,9 @@
-import { createUserDto } from './dto/create-user.dto';
+import { createUserDto } from '../dto/create-user.dto';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { Repository } from 'typeorm';
-import { User } from './user.entity';
+import { User } from '../entities/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { UpdateUserDto } from './dto/update-user.dto';
+import { UpdateUserDto } from '../dto/update-user.dto';
 
 @Injectable()
 export class UsersService {
@@ -18,10 +18,16 @@ export class UsersService {
     }
 
     find(email?: string) {
-        return this.repo.find({ where: { email }, select: ['id', 'email'] });
+        return this.repo.find({
+            where: { email },
+            select: ['id', 'email', 'password'],
+        });
     }
 
     async findOne(id: number) {
+        if (!id) {
+            return null;
+        }
         const user = await this.repo.findOneBy({ id });
         if (!user) {
             throw new NotFoundException(`User #${id} not found`);

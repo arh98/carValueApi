@@ -5,14 +5,23 @@ export class User {
     @PrimaryGeneratedColumn()
     id: number;
 
-    @Column()
+    @Column(/*{ unique: true }*/)
     email: string;
+
+    // @Column()
+    // name?: string;
+
+    // @Column({ default: true })
+    // active?: boolean;
+
+    // @Column({ enum: ['user', 'admin', 'manager'], default: 'user' })
+    // role: string;
 
     @Column()
     password: string;
 
     @AfterInsert()
-    logInsert(){
+    logInsert() {
         console.log('user inserted with id : ' + this.id);
     }
 }

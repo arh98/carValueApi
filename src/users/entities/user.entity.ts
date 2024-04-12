@@ -1,5 +1,11 @@
-import { Entity, Column, PrimaryGeneratedColumn, AfterInsert } from 'typeorm';
-
+import {
+    Entity,
+    Column,
+    PrimaryGeneratedColumn,
+    AfterInsert,
+    OneToMany,
+} from 'typeorm';
+import { Report } from 'src/reports/entities/report.entity';
 @Entity()
 export class User {
     @PrimaryGeneratedColumn()
@@ -8,17 +14,17 @@ export class User {
     @Column(/*{ unique: true }*/)
     email: string;
 
-    // @Column()
-    // name?: string;
+    @Column({ default: true })
+    active?: boolean;
 
-    // @Column({ default: true })
-    // active?: boolean;
-
-    // @Column({ enum: ['user', 'admin', 'manager'], default: 'user' })
-    // role: string;
+    @Column({ enum: ['user', 'admin', 'manager'], default: 'user' })
+    role: string;
 
     @Column()
     password: string;
+
+    @OneToMany(() => Report, (report) => report.user)
+    reports: Report[];
 
     @AfterInsert()
     logInsert() {

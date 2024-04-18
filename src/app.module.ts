@@ -1,29 +1,42 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module } from '@nestjs/common';
 import { AppController } from './app.controller';
-import { AppService } from './app.service';
 import { ReportsModule } from './reports/reports.module';
 import { UsersModule } from './users/users.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from './users/entities/user.entity';
 import { Report } from './reports/entities/report.entity';
+import { ConfigModule } from '@nestjs/config';
+const cookieSession = require('cookie-session');
 
 @Module({
     imports: [
+        ConfigModule.forRoot(),
         TypeOrmModule.forRoot({
-            type: 'sqlite',
-            database: 'db.sqlite',
-            // host: process.env.DB_HOST,
-            // port: +process.env.DB_PORT,
-            // username: process.env.DB_USERNAME,
-            // password: process.env.DB_PASSWORD,
-            // autoLoadEntities: true,
+            type: process.env.NODE_ENV === 'production' ? 'postgres' : 'sqlite',
+            database: process.env.DB_NAME,
+            host: process.env.DB_HOST,
+            port: +process.env.DB_PORT,
+            username: process.env.DB_USERNAME,
+            password: process.env.DB_PASSWORD,
             entities: [User, Report],
             synchronize: process.env.NODE_ENV === 'production' ? false : true,
         }),
-        ReportsModule,
         UsersModule,
+        ReportsModule,
     ],
     controllers: [AppController],
-    providers: [AppService],
+    providers: [],
 })
-export class AppModule {}
+export class AppModule {
+    constructor() {}
+
+    configure(consumer: MiddlewareConsumer) {
+        consumer
+            .apply(
+                cookieSession({
+                    keys: [process.env.COOKIE_KEY],
+                }),
+            )
+            .forRoutes('*');
+    }
+}

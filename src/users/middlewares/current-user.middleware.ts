@@ -1,4 +1,3 @@
-import { User } from '../entities/user.entity';
 import { UsersService } from '../services/users.service';
 import { Injectable, NestMiddleware } from '@nestjs/common';
 

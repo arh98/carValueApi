@@ -4,6 +4,7 @@
 /build
 
 db.sqlite
+
 # Logs
 logs
 *.log

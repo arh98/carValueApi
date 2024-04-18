@@ -1,3 +1,4 @@
+import { ReportsService } from './../../reports/reports.service';
 import { createUserDto } from '../dto/create-user.dto';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { Repository } from 'typeorm';
@@ -20,7 +21,7 @@ export class UsersService {
     find(email?: string) {
         return this.repo.find({
             where: { email },
-            select: ['id', 'email', 'password'],
+            // select: ['id', 'email', 'password' ],
         });
     }
 
@@ -28,12 +29,7 @@ export class UsersService {
         if (!id) {
             return null;
         }
-        const user = await this.repo.findOneBy({ id });
-        if (!user) {
-            throw new NotFoundException(`User #${id} not found`);
-        }
-        // const { password, ...userDto } = user;
-        return user;
+        return await this.findAndCheckExists(id);
     }
 
     async update(id: number, updateDto: UpdateUserDto) {
@@ -48,10 +44,33 @@ export class UsersService {
     }
 
     async remove(id: number) {
+        const user = await this.findAndCheckExists(id);
+        return this.repo.remove(user);
+    }
+
+    async deActive(id: number) {
+        const user = await this.findAndCheckExists(id);
+        user.active = false;
+        return this.repo.save(user);
+    }
+
+    async active(id: number) {
+        const user = await this.findAndCheckExists(id);
+        user.active = true;
+        return this.repo.save(user);
+    }
+
+    async changeRole(id: number, role: string) {
+        const user = await this.findAndCheckExists(id);
+        user.role = role;
+        return this.repo.save(user);
+    }
+
+    async findAndCheckExists(id: number) {
         const user = await this.repo.findOneBy({ id });
         if (!user) {
             throw new NotFoundException(`User #${id} not found`);
         }
-        return this.repo.remove(user);
+        return user;
     }
 }

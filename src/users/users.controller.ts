@@ -3,6 +3,7 @@ import {
     Body,
     Controller,
     Delete,
+    ForbiddenException,
     Get,
     HttpCode,
     HttpStatus,
@@ -87,8 +88,18 @@ export class UsersController {
     }
 
     @Patch('/:id')
-    updateUser(@Param('id') id: string, @Body() body: UpdateUserDto) {
-        return this.userService.update(+id, body);
+    @UseGuards(AuthGuard)
+    updateUser(
+        @CurrentUser() user: User,
+        @Param('id') id: string,
+        @Body() body: UpdateUserDto,
+    ) {
+        if (+user.id === +id) {
+            return this.userService.update(+id, body);
+        }
+        return new ForbiddenException(
+            "You don't have permission to do this operation",
+        );
     }
 
     @Post('/active/:id')

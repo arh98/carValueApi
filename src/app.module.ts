@@ -12,7 +12,7 @@ const cookieSession = require('cookie-session');
     imports: [
         ConfigModule.forRoot(),
         TypeOrmModule.forRoot({
-            type: process.env.NODE_ENV === 'production' ? 'postgres' : 'sqlite',
+            type: 'postgres',
             database: process.env.DB_NAME,
             host: process.env.DB_HOST,
             port: +process.env.DB_PORT,

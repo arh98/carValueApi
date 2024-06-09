@@ -18,12 +18,14 @@ export class ReportsService {
         return this.repo
             .createQueryBuilder()
             .select('AVG(price)', 'price')
+            .addSelect('mileage')
             .where('made = :made', { made })
             .andWhere('model = :model', { model })
             .andWhere('lng - :lng BETWEEN -5 AND 5', { lng })
             .andWhere('lat - :lat BETWEEN -5 AND 5', { lat })
             .andWhere('year - :year BETWEEN -3 AND 3', { year })
             .andWhere('approved IS TRUE')
+            .groupBy('mileage')
             .orderBy('ABS(mileage - :mileage)', 'DESC')
             .setParameters({ mileage })
             .limit(3)
@@ -69,6 +71,9 @@ export class ReportsService {
                 where: { id },
                 relations: ['user'],
             });
+            if (!report) {
+                throw new NotFoundException(`Report #${id} not found`);
+            }
         } else {
             report = await this.repo.findOneBy({ id });
             if (!report) {
